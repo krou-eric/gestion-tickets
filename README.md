@@ -1,109 +1,119 @@
-# CRM — PHP / MySQL / MVC
+# Gestion de Tickets — React / NestJS / MySQL
 
-Application CRM (Customer Relationship Management) développée dans le cadre du BTS SIO SLAM (2026).
+Application de gestion de tickets développée durant mon stage chez ALEOS (BTS SIO SLAM — 2025).
 
 ## Présentation
 
-Application web de gestion de la relation client permettant de gérer des contacts, des entreprises et des utilisateurs. Développée en PHP pur avec une architecture MVC sans framework.
+POC (Proof of Concept) d'une application full stack permettant de créer, rechercher et afficher des tickets connectés à Jira via son API REST.
 
 ## Fonctionnalités
 
-- Authentification avec système de rôles (Admin / Standard)
-- Gestion des contacts (CRUD complet)
-- Gestion des entreprises
-- Recherche et filtres sur les contacts
-- Tableau de bord avec statistiques
-- Gestion des utilisateurs (Admin uniquement)
-- Prévention des doublons
+- Création de tickets (titre, description, ID utilisateur)
+- Recherche de tickets par ID
+- Récupération de tous les tickets avec filtres
+- Statistiques : tickets "à faire", "en cours", "traités"
+- Connexion à l'API Jira pour synchronisation
+- Documentation API via Swagger
 
 ## Stack technique
 
-| Technologie | Usage |
-|-------------|-------|
-| PHP | Backend, logique métier |
-| MySQL | Base de données |
-| HTML / CSS | Interface utilisateur |
-| Architecture MVC | Structure du code |
-| WAMP | Environnement de développement |
+| Couche | Technologie |
+|--------|-------------|
+| Frontend | React, JavaScript |
+| Backend | NestJS, TypeScript |
+| Base de données | MySQL |
+| Documentation API | Swagger |
+| Versioning | Git / GitHub |
 
-## Architecture MVC
-
-```
-crm-php-mvc/
-├── app/
-│   └── views/
-│       ├── auth/
-│       │   └── login.php
-│       ├── contacts/
-│       │   ├── index.php
-│       │   ├── form.php
-│       │   └── show.php
-│       ├── users/
-│       │   ├── index.php
-│       │   └── form.php
-│       ├── dashboard/
-│       │   └── index.php
-│       └── layout/
-│           ├── header.php
-│           └── footer.php
-├── dao/
-│   ├── ContactDAO.php
-│   ├── EntrepriseDAO.php
-│   ├── UtilisateurDAO.php
-│   ├── InteractionDAO.php
-│   └── PersonneDAO.php
-├── models/
-│   ├── Contact.php
-│   ├── Entreprise.php
-│   ├── Personne.php
-│   └── Standard.php
-├── config/
-│   └── Database.php
-└── public/
-    └── index.php
-```
-
-## Modèle de données (MCD)
+## Architecture
 
 ```
-ENTREPRISE ──< CONTACT >── PERSONNE_PHYSIQUE
-     │
-     └── STATUT
+FRONT (React)
+    │
+    └── API REST
+          │
+    BACK (NestJS)
+          │
+    ├── MySQL (base de données)
+    └── API Jira (synchronisation tickets)
+```
 
-UTILISATEUR (Admin / Standard)
+## Structure du projet
+
+```
+gestion-tickets/
+├── poc/              ← Frontend React
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── TicketDetails.js
+│   │   │   ├── TicketSearch.js
+│   │   │   └── UserDetails.js
+│   │   └── pages/
+│   │       ├── TicketPage.js
+│   │       └── HomePage.js
+│   └── package.json
+└── poc-mgn/          ← Backend NestJS
+    ├── src/
+    │   ├── ticket/
+    │   └── utilisateurs/
+    └── package.json
 ```
 
 ## Installation
 
 ### Prérequis
-- WAMP / XAMPP
-- PHP 7.4+
+- Node.js
 - MySQL
+- WAMP ou équivalent
 
-### Étapes
-1. Copier le dossier dans `C:\wamp64\www\CRM`
-2. Importer la base de données via phpMyAdmin
-3. Configurer la connexion dans `config/Database.php`
-4. Accéder à `http://localhost/CRM/public/`
+### Backend (NestJS)
+```bash
+cd poc-mgn
+npm install
+npm run start
+```
+L'API est accessible sur `http://localhost:3000`
+La documentation Swagger est sur `http://localhost:3000/api#/`
 
-### Comptes de test
-| Rôle | Login | Mot de passe |
-|------|-------|--------------|
-| Admin | admin@crm.fr | admin123 |
-| Standard | user@crm.fr | user123 |
+### Frontend (React)
+```bash
+cd poc
+npm install
+npm start
+```
+L'application est accessible sur `http://localhost:3001`
 
-## Système de rôles
+## Routes API
 
-| Fonctionnalité | Admin | Standard |
-|----------------|-------|----------|
-| Voir les contacts | ✅ | ✅ |
-| Ajouter un contact | ✅ | ✅ |
-| Modifier un contact | ✅ | ✅ |
-| Supprimer un contact | ✅ | ❌ |
-| Gérer les utilisateurs | ✅ | ❌ |
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| GET | /tickets | Récupérer tous les tickets |
+| GET | /tickets/:id | Récupérer un ticket par ID |
+| POST | /tickets | Créer un ticket |
+| PUT | /tickets/:id | Modifier un ticket |
+| DELETE | /tickets/:id | Supprimer un ticket |
+
+## Base de données
+
+```sql
+CREATE TABLE ticket (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(255),
+  description VARCHAR(255) NULLABLE,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE utilisateur (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nom VARCHAR(255),
+  prenom VARCHAR(255),
+  email VARCHAR(255) UNIQUE,
+  motDePasse VARCHAR(255)
+);
+```
 
 ## Auteur
 
 **Krou Eric-Donald Akpangni**
 BTS SIO SLAM — Lycée Carcouet, Nantes
-2026
+Stage ALEOS — 2025
